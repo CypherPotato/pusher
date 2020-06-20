@@ -13,16 +13,27 @@
                     <div class="card-body collapse show" id="block1">
                         <div class="row">
                             <div class="form-group col-sm-12 col-md-7">
-                                <label for="hashLabel">Chave privada</label>
+                                <label for="hashLabel">Chave privada <span class="text-danger">(não informe essa chave para ninguém)</span></label>
                                 <input class="form-control bg-white" id="hashLabel" type="text" readonly value="{{$hash}}">
                             </div>
                             <div class="form-group col-sm-12 col-md-3">
                                 <label for="endpoint">Endpoint</label>
-                                <input class="form-control bg-white" id="endpoint" type="text" readonly value="https://{{$hostname}}/push">
+                                <input class="form-control bg-white" id="endpoint" type="text" readonly value="https://{{$hostname}}/get">
                             </div>
                             <div class="form-group col-sm-12 col-md-2">
                                 <label for="endpoint">Método</label>
                                 <input class="form-control bg-white" id="endpoint" type="text" readonly value="POST">
+                            </div>
+                            <div class="form-group col-sm-12 col-md-7">
+                                <label for="hashLabel">Chave pública</label>
+                                <input class="form-control bg-white" id="hashLabel" type="text" readonly value="{{$public_key ?? "Será gerada após a criação do conteúdo"}}">
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12">
+                                <span>Instruções para uso de API:</span>
+                                <ul class="mb-0">
+                                    <li><code>public_key</code> - chave para receber o texto da mensagem</li>
+                                    <li><code>raw</code> - somente <code>true</code> ou <code>false</code>: informa se a mensagem deve vir por escrito ou em JSON.</li>
+                                </ul>
                             </div>
                         </div>
                         <form action="{{route('createKeyPair')}}">

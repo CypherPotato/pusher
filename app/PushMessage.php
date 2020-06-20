@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PushMessage extends Model
 {
     protected $fillable = [
-        'private_key', 'subject', 'message', 'id'
+        'public_key', 'subject', 'message', 'id'
     ];
 
     protected $table = "pushmessages";

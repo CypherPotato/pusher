@@ -90,27 +90,29 @@ class PushController extends Controller
             return redirect(route('ViewMessages', ["hash" => $hash])); // esconde o login e senha no login
         }
 
-        $messages = PushMessage::where('private_key', $hash)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'messages');
+        $public_key = hash('sha256', $hash);
+
+        $messages = PushMessage::where('public_key', $public_key)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'messages');
         $messages->setPath($request->fullUrl());
 
         $keys = KeyPair::where('private_key', $hash)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'keys');
         $keys->setPath($request->fullUrl());
 
-        return view('viewMessages', ["messages" => $messages, 'public_keys' => $keys, "hash" => $hash, "hostname" => $_SERVER['SERVER_NAME']]);
+        return view('viewMessages', ["messages" => $messages, 'public_key' => $public_key, 'public_keys' => $keys, "hash" => $hash, "hostname" => $_SERVER['SERVER_NAME']]);
     }
 
     public static function Push(Request $request) {
         $pmsg = new PushMessage;
 
-        if($request->private_key == null) return response()->json(["success" => false, "message" => "Private key not provided."], 400);
+        if($request->public_key == null) return response()->json(["success" => false, "message" => "Public key not provided."], 400);
         if($request->subject == null) return response()->json(["success" => false, "message" => "Subject not provided."], 400);
         if($request->message == null) return response()->json(["success" => false, "message" => "Message not provided."], 400);
-        if(strlen($request->private_key) != 64) return response()->json(["success" => false, "message" => "Private key is invalid."], 400);
-        if(!ctype_xdigit($request->private_key)) return response()->json(["success" => false, "message" => "Private key is invalid."], 400);
+        if(strlen($request->public_key) != 64) return response()->json(["success" => false, "message" => "Public key is invalid."], 400);
+        if(!ctype_xdigit($request->public_key)) return response()->json(["success" => false, "message" => "Public key is invalid."], 400);
         if(strlen($request->message) >= 2048) return response()->json(["success" => false, "message" => "Message length is too big (>2048)."], 400);
         if(strlen($request->subject) >= 512) return response()->json(["success" => false, "message" => "Subject length is too big (>512)."], 400);
 
-        $pmsg->private_key = $request->private_key;
+        $pmsg->public_key = $request->public_key;
         $pmsg->subject = $request->subject;
         $pmsg->message = $request->message;
 

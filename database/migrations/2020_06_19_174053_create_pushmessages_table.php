@@ -16,7 +16,7 @@ class CreatePushmessagesTable extends Migration
         Schema::create('pushmessages', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string("private_key");
+            $table->string("public_key");
             $table->mediumText("subject");
             $table->longText("message");
         });
