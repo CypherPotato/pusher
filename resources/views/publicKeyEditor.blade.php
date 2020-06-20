@@ -28,11 +28,14 @@
                                 <label for="hashLabel">Chave pública</label>
                                 <input class="form-control bg-white" id="hashLabel" type="text" readonly value="{{$public_key ?? "Será gerada após a criação do conteúdo"}}">
                             </div>
+                            <div class="form-group col-sm-12 col-md-5">
+                                <label for="hashLabel">Salto</label>
+                                <input class="form-control bg-white" id="hashLabel" type="text" readonly value="{{$salt}}">
+                            </div>
                             <div class="form-group col-sm-12 col-md-12">
                                 <span>Instruções para uso de API:</span>
                                 <ul class="mb-0">
                                     <li><code>public_key</code> - chave para receber o texto da mensagem</li>
-                                    <li><code>raw</code> - somente <code>true</code> ou <code>false</code>: informa se a mensagem deve vir por escrito ou em JSON.</li>
                                 </ul>
                             </div>
                         </div>

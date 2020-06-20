@@ -37,6 +37,10 @@
                                 <label for="hashLabel">Chave pública</label>
                                 <input class="form-control bg-white" id="hashLabel" type="text" readonly value="{{$public_key}}">
                             </div>
+                            <div class="form-group col-sm-12 col-md-5">
+                                <label for="hashLabel">Salto</label>
+                                <input class="form-control bg-white" id="hashLabel" type="text" readonly value="{{$salt}}">
+                            </div>
                             <div class="form-group col-sm-12 col-md-12">
                                 <span>Instruções para uso de API:</span>
                                 <ul class="mb-0">

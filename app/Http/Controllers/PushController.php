@@ -16,11 +16,7 @@ class PushController extends Controller
             return response()->json(['message' => 'Invalid public key.'], 404);;
         }
 
-        if($request->raw == 'true') {
-            return response($newKeyPair->text, 200);
-        } else {
-            return response()->json(['public_key' => $request->public_key, "text" => $newKeyPair->text], 200);
-        }
+        return response()->json(['public_key' => $request->public_key, "salt" => hash('md5', $newKeyPair->private_key), "text" => $newKeyPair->text], 200);
     }
 
     public static function EditPublicKeyView(Request $request) {
@@ -29,20 +25,26 @@ class PushController extends Controller
 
         $kp = KeyPair::where('public_key', $request->public_key)->first();
 
+        $salt = hash('md5', $request->hash);
+
         return view('publicKeyEditor', [
             "hostname" => $_SERVER['SERVER_NAME'],
             "hash" => $request->hash,
             "text" => $kp->text,
-            "public_key" => $request->public_key
+            "public_key" => $request->public_key,
+            "salt" => $salt
         ]);
     }
 
     public static function CreatePublicKeyView(Request $request) {
         if($request->hash == null) return back()->with("message", "Requisição inválida: chave privada inválida.");
 
+        $salt = hash('md5', $request->hash);
+
         return view('publicKeyEditor', [
             "hostname" => $_SERVER['SERVER_NAME'],
-            "hash" => $request->hash
+            "hash" => $request->hash,
+            "salt" => $salt
         ]);
     }
 
@@ -90,6 +92,7 @@ class PushController extends Controller
             return redirect(route('ViewMessages', ["hash" => $hash])); // esconde o login e senha no login
         }
 
+        $salt = hash('md5', $request->hash);
         $public_key = hash('sha256', $hash);
 
         $messages = PushMessage::where('public_key', $public_key)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'messages');
@@ -98,7 +101,7 @@ class PushController extends Controller
         $keys = KeyPair::where('private_key', $hash)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'keys');
         $keys->setPath($request->fullUrl());
 
-        return view('viewMessages', ["messages" => $messages, 'public_key' => $public_key, 'public_keys' => $keys, "hash" => $hash, "hostname" => $_SERVER['SERVER_NAME']]);
+        return view('viewMessages', ["messages" => $messages, 'public_key' => $public_key, 'salt' => $salt, 'public_keys' => $keys, "hash" => $hash, "hostname" => $_SERVER['SERVER_NAME']]);
     }
 
     public static function Push(Request $request) {
