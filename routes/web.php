@@ -19,6 +19,9 @@ Route::get('/', function () {
 
 Route::post("/get", "PushController@GetPublicKeyContent")->name("api.key");
 Route::post("/push", "PushController@Push")->name("api.push");
+Route::post("/create-key", "PushController@CreateKeyPair")->name("api.createpublickey");
+Route::post("/delete-key", "PushController@DeleteKeyPair")->name("api.deletepublickey");
+
 Route::get("/createPublicKey", "PushController@CreateKeyPair")->name("createKeyPair");
 Route::get("/view", "PushController@ViewMessages")->name("ViewMessages");
 Route::get("/view/createKey", "PushController@CreatePublicKeyView")->name("CreatePublicKey");

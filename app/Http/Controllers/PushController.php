@@ -49,38 +49,72 @@ class PushController extends Controller
     }
 
     public static function CreateKeyPair(Request $request) {
-        if($request->message == null) return back()->with("message", "Mensagem do bloco de chave pública é necessária.");
-        if($request->hash == null) return back()->with("message", "Requisição inválida: chave privada inválida.");
-
-        if($request->public_key == "-1") {
-            $newKeyPair = new KeyPair;
-            $newKeyPair->text = $request->message;
-            $newKeyPair->private_key = $request->hash;
-            $newKeyPair->public_key = hash('sha256', $request->hash . $request->message . rand());
+        if($request->method() == "GET") {
+            if($request->message == null) return back()->with("message", "Mensagem do bloco de chave pública é necessária.");
+            if($request->hash == null) return back()->with("message", "Requisição inválida: chave privada inválida.");
         } else {
+            if($request->text == null) return response()->json(["message" => "Mensagem do bloco de chave pública é necessária."], 400);
+            if($request->private_key == null) return response()->json(["message" => "Requisição inválida: chave privada inválida."], 400);
+        }
+
+        $public_key = "";
+        if($request->public_key == "-1" || $request->public_key == null) {
+            $public_key = hash('sha256', $request->hash . $request->message . rand());
+            $newKeyPair = new KeyPair;
+            $newKeyPair->text = $request->message ?? $request->text;
+            $newKeyPair->private_key = $request->hash ?? $request->private_key;
+            $newKeyPair->public_key = $public_key;
+        } else {
+            $public_key = $request->public_key ?? "";
             $newKeyPair = KeyPair::where('public_key', $request->public_key)->first();
-            if($newKeyPair == null) {
-                return back()->with("message", "Requisição inválida: chave pública inválida.");
+            if($newKeyPair == null && $request->public_key != null) {
+                if($request->method() == "GET") {
+                    return back()->with("message", "Requisição inválida: chave pública inválida.");
+                } else {
+                    return response()->json(["message" => "Requisição inválida: chave pública inválida."], 400);
+                }
+            } else {
+                if($request->method() == "GET") {
+                    $newKeyPair->text = $request->message;
+                } else {
+                    $newKeyPair->text = $request->text;
+                }
             }
-            $newKeyPair->text = $request->message;
         }
 
         $newKeyPair->save();
 
-        return redirect(route('ViewMessages', ["hash" => $request->hash]));
+        if($request->method() == "GET") {
+            return redirect(route('ViewMessages', ["hash" => $request->hash]));
+        } else {
+            return response()->json(["message" => "Chave " . ($request->public_key == null ? 'criada' : 'alterada') . " com sucesso.", "public_key" => $public_key, "text" => $request->text], 200);
+        }
     }
 
     public static function DeleteKeyPair(Request $request) {
-        if($request->hash == null) return back()->with("message", "Requisição inválida: chave privada inválida.");
-        if($request->public_key == null) return back()->with("message", "Requisição inválida: chave pública inválida.");
+        if($request->method() == "GET") {
+            if($request->public_key == null) return back()->with("message", "Requisição inválida: chave pública inválida.");
+            if($request->hash == null) return back()->with("message", "Requisição inválida: chave privada inválida.");
+        } else {
+            if($request->public_key == null) return response()->json(["message" => "Requisição inválida: chave pública inválida."], 400);
+            if($request->private_key == null) return response()->json(["message" => "Requisição inválida: chave privada inválida."], 400);
+        }
 
         $newKeyPair = KeyPair::where('public_key', $request->public_key)->first();
         if($newKeyPair == null) {
-            return back()->with("message", "Requisição inválida: chave pública inválida.");
+            if($request->method == "GET") {
+                return back()->with("message", "Requisição inválida: chave pública inválida.");
+            } else {
+                return response()->json(["message" => "Requisição inválida: chave pública inválida."], 400);
+            }
         }
         $newKeyPair->forceDelete();
 
-        return redirect(route('ViewMessages', ["hash" => $request->hash]));
+        if($request->method() == "GET") {
+            return redirect(route('ViewMessages', ["hash" => $request->hash]));
+        } else {
+            return response()->json(["message" => "Chave excluída com sucesso.", "public_key" => $request->public_key], 200);
+        }
     }
 
     public static function ViewMessages(Request $request) {

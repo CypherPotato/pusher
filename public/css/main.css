@@ -1,0 +1,16 @@
+* {
+    border-radius: 0 !important;
+}
+
+a,
+button {
+    border: none !important;
+}
+
+.pusher-color {
+    color: rgb(0, 48, 209);
+}
+
+.pusher-bg {
+    background-color: rgb(0, 48, 209);
+}

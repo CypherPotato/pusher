@@ -44,7 +44,8 @@
                             <input hidden type="text" name="public_key" value="{{$public_key ?? "-1"}}">
                             <div class="form-group">
                                 <label for="exampleFormControlFile1">Mensagem da chave pública</label>
-                                <textarea class="form-control" style="min-height: 256px" maxlength="2048" name="message">{{$text ?? ""}}</textarea>
+                                <textarea onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}"
+                                 class="form-control" style="min-height: 256px; font-family: monospace;" maxlength="2048" id="message" name="message">{{$text ?? ""}}</textarea>
                             </div>
                             @if(\Session::has("message"))
                                 <span>
@@ -56,7 +57,7 @@
                                     @if(isset($public_key))
                                     <a href="{{route('DeleteKeyPair', ['hash' => $hash, 'public_key' => $public_key])}}" class="btn btn-outline-danger mr-2">Excluir chave pública</a>
                                     @endif
-                                    <button type="submit" class="btn btn-primary">Criar chave pública</button>
+                                    <button type="submit" class="btn btn-primary pusher-bg">{{isset($public_key) ? 'Alterar' : 'Criar'}} chave pública</button>
                                 </div>
                             </div>
                         </form>

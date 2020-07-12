@@ -5,8 +5,8 @@
 <div class="container h-100">
     <div class="row h-100 justify-content-center">
         <div class="col-md-8 my-auto">
-            <div class="card w-100 p-4">
-                <h4 class="w-100 text-center">PUSHER</h4>
+            <div class="card d-flex w-100 p-4">
+                <img src="{{asset('img/pusher.png')}}" class="mx-auto mb-3" style="height: auto; width: 70%">
                 <form method="GET" action="{{route('ViewMessages')}}">
                     <div class="form-group">
                       <label for="exampleInputEmail1">Identificação</label>
@@ -22,7 +22,7 @@
                         <span class="text-danger">{{\Session::get("message")}}</span>
                     </div>
                     @endif
-                    <button type="submit" class="btn btn-primary">Acessar</button>
+                    <button type="submit" class="btn text-center btn-primary pusher-bg">Acessar</button>
                 </form>
             </div>
         </div>

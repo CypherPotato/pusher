@@ -4,6 +4,10 @@
 
 <div class="container h-100">
     <div class="row justify-content-center">
+        <a href="/" class="mr-auto">
+            <img src="{{asset('img/pusher.png')}}" class="ml-4 mt-4" style="height: auto; width: 256px">
+        </a>
+
         @if(\Session::has('message'))
         <div class="col-12 my-3">
             <div class="alert alert-primary">
@@ -11,11 +15,11 @@
             </div>
         </div>
         @endif
-        <div class="col-12 mt-3">
+        <div class="col-12 mt-3 pb-5">
             <div id="accordion">
                 <div class="card mb-2">
                     <div class="card-header">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#block1" aria-expanded="true" aria-controls="block1">
+                        <button class="btn btn-link pusher-color" data-toggle="collapse" data-target="#block1" aria-expanded="true" aria-controls="block1">
                             Informações do canal de recibo de mensagens
                         </button>
                     </div>
@@ -54,7 +58,7 @@
                 </div>
                 <div class="card mb-2">
                     <div class="card-header">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#block2" aria-expanded="true" aria-controls="block">
+                        <button class="btn btn-link pusher-color" data-toggle="collapse" data-target="#block2" aria-expanded="true" aria-controls="block">
                             Últimas mensagens recebidas no canal
                         </button>
                     </div>
@@ -76,7 +80,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan=4 class="text-center">Não há mensagens recebidas neste canal.</td>
+                                    <td colspan=4 class="text-center pt-3">Não há mensagens recebidas neste canal.</td>
                                 </tr>
                             @endforelse
                             </tbody>
@@ -86,7 +90,7 @@
                 </div>
                 <div class="card">
                     <div class="card-header">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#block3" aria-expanded="true" aria-controls="block3">
+                        <button class="btn btn-link pusher-color" data-toggle="collapse" data-target="#block3" aria-expanded="true" aria-controls="block3">
                             Chaves públicas
                         </button>
                     </div>
@@ -110,13 +114,13 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan=4 class="text-center">Não há chaves públicas criadas neste canal.</td>
+                                    <td colspan=4 class="text-center pt-3">Não há chaves públicas criadas neste canal.</td>
                                 </tr>
                             @endforelse
                             </tbody>
                         </table>
                         <div class="d-flex w-100">
-                            <a href="{{route('CreatePublicKey', ['hash' => $hash])}}" class="btn btn-link ml-auto">
+                            <a href="{{route('CreatePublicKey', ['hash' => $hash])}}" class="btn btn-primary pusher-bg ml-auto">
                                 Criar chave pública
                             </a>
                         </div>
