@@ -76,7 +76,7 @@
                                 <tr>
                                     <td scope="col" width="20%"><small>{{$message->created_at->toString()}}<small></td>
                                     <td scope="col" width="30%" style="word-wrap: break-word;"><small>{{$message->subject}}<small></td>
-                                    <td scope="col" width="50%" style="word-wrap: break-word;"><small>{{$message->message}}<small></td>
+                                    <td scope="col" width="50%" style="word-wrap: break-word;"><small>{!! $message->message !!}<small></td>
                                 </tr>
                             @empty
                                 <tr>
