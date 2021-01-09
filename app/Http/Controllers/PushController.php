@@ -142,8 +142,7 @@ class PushController extends Controller
         $salt = hash('md5', $request->hash);
         $public_key = hash('sha256', $hash);
 
-        $messages = PushMessage::where('public_key', $public_key)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'messages');
-        $messages->setPath($request->fullUrl());
+        $messages = PushMessage::where('public_key', $public_key)->orderBy("created_at", "DESC")->all();
 
         $keys = KeyPair::where('private_key', $hash)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'keys');
         $keys->setPath($request->fullUrl());
