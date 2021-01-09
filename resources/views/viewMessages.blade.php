@@ -63,20 +63,22 @@
                         </button>
                     </div>
                     <div class="card-body collapse show" id="block2">
-                        <table class="table table-sm">
+                        <table id="messagesTable" class="table table-sm">
                             <thead>
                             <tr>
                                 <th scope="col" width="20%"><small><b>Data e hora</b></small></th>
                                 <th scope="col" width="30%"><small><b>Assunto</b></small></th>
                                 <th scope="col" width="50%"><small><b>Mensagem</b></small></th>
+                                <th scope="col" width="5%"><small></small></th>
                             </tr>
                             </thead>
                             <tbody>
                             @forelse($messages as $message)
                                 <tr>
                                     <td scope="col" width="20%"><small>{{$message->created_at->toString()}}<small></td>
-                                    <td scope="col" width="30%" style="word-wrap: break-word;"><small>{{$message->subject}}<small></td>
+                                    <td scope="col" width="25%" style="word-wrap: break-word;"><small>{{$message->subject}}<small></td>
                                     <td scope="col" width="50%" style="word-wrap: break-word;"><small>{!! $message->message !!}<small></td>
+                                        <th scope="col" width="5%"><a class="btn btn-sm btn-link" href="{{route('DeleteMessage', ['hash' => $public_key, 'id' => $message->id])}}">Excluir</a></th>
                                 </tr>
                             @empty
                                 <tr>
@@ -85,7 +87,6 @@
                             @endforelse
                             </tbody>
                         </table>
-                        {{ $messages->render() }}
                     </div>
                 </div>
                 <div class="card">
@@ -109,7 +110,7 @@
                                 <tr>
                                     <td scope="col" width="20%"><small>{{$key->created_at->toString()}}<small></td>
                                     <td scope="col" width="50%"><code>{{$key->public_key}}<code></td>
-                                    <td scope="col" width="25%" style="word-wrap: break-word;"><small>{{$key->text}}<small></td>
+                                    <td scope="col" width="25%" style="word-wrap: break-word;"><small>{{substr($key->text, 0, 44)}}<small></td>
                                     <th scope="col" width="5%"><a class="btn btn-sm btn-link" href="{{route('EditPublicKeyView', ['public_key' => $key->public_key, 'hash' => $hash])}}">Editar</a></th>
                                 </tr>
                             @empty
@@ -134,3 +135,11 @@
         </div>
     </div>
 </div>
+
+@section("scripts")
+<script>
+$(document).ready(function() {
+    $("#messagesTable").dataTable();
+});
+</script>
+@endsection

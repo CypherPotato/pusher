@@ -27,3 +27,5 @@ Route::get("/view", "PushController@ViewMessages")->name("ViewMessages");
 Route::get("/view/createKey", "PushController@CreatePublicKeyView")->name("CreatePublicKey");
 Route::get("/view/editKey", "PushController@EditPublicKeyView")->name("EditPublicKeyView");
 Route::get("/view/deleteKey", "PushController@DeleteKeyPair")->name("DeleteKeyPair");
+
+Route::get("/deleteMessage", "PushController@DeleteMessage")->name("DeleteMessage");

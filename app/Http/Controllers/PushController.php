@@ -91,6 +91,19 @@ class PushController extends Controller
         }
     }
 
+    public static function DeleteMessage(Request $request) {
+        if($request->id == null) return back()->with("message", "Erro: não foi providenciado o ID.");
+        if($request->hash == null) return back()->with("message", "Erro: não foi providenciado a chave pública.");
+
+        $msg = PushMessage::where('id', $request->id)->first();
+
+        if($msg == null) return back()->with("message", "Erro: mensagem não encontrada.");
+        if($msg->public_key != $request->hash) return back()->with("message", "Erro: chave pública não confere com a da mensagem.");
+
+        $msg->delete();
+        return back();
+    }
+
     public static function DeleteKeyPair(Request $request) {
         if($request->method() == "GET") {
             if($request->public_key == null) return back()->with("message", "Requisição inválida: chave pública inválida.");
