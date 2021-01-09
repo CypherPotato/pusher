@@ -140,7 +140,7 @@
 <script>
 $(document).ready(function() {
     $("#messagesTable").dataTable([
-        "order": [[ 0, 'dec' ]]
+        "order": []
     ]);
 });
 </script>
