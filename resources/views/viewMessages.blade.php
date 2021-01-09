@@ -139,9 +139,9 @@
 @section("scripts")
 <script>
 $(document).ready(function() {
-    $("#messagesTable").dataTable([
+    $("#messagesTable").dataTable({
         "order": []
-    ]);
+    });
 });
 </script>
 @endsection
