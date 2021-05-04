@@ -300,7 +300,12 @@ class PushController extends Controller
 
         $msgs = PushMessage::where(["public_key" => $request->public_key, "subject" => $request->subject])->get();
 
-        return response()->json($msgs);
+        $dataToReturn = [];
+        foreach($msgs as $msg) {
+            $dataToReturn[] = ["data" => $msg->toArray()];
+        }
+
+        return response()->json($dataToReturn);
     }
 
     public static function SendTelegramMessage($public_key, $message) {
