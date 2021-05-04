@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::post("/api/push", "PushController@Push")->name("api.push");
 Route::get("/api/push", "PushController@GetMessage")->name("api.getmessage");
 Route::patch("/api/push", "PushController@EditMessage")->name("api.editmessage");
+Route::get("/api/find/subject", "PushController@FindMessageBySubject")->name("api.FindMessageBySubject");
 Route::delete("/api/public_key", "PushController@DeleteKeyPair")->name("api.deletepublickey");
 Route::post("/api/public_key", "PushController@CreateKeyPair")->name("createKeyPair");
 Route::get("/api/public_key", "PushController@GetPublicKeyContent")->name("api.key");

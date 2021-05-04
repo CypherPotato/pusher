@@ -293,6 +293,16 @@ class PushController extends Controller
         return response()->json(["success" => true, "message" => "Message inserted", "data" => $data], 200);
     }
 
+    // /api/find/subject
+    public static function FindMessageBySubject(Request $request) {
+        if($request->public_key == null) return response()->json(["success" => false, "message" => "Public key not provided."], 400);
+        if($request->subject == null) return response()->json(["success" => false, "message" => "Subject not provided."], 400);
+
+        $msgs = PushMessage::where(["public_key" => $request->public_key, "subject" => $request->subject])->get();
+
+        return response()->json($msgs);
+    }
+
     public static function SendTelegramMessage($public_key, $message) {
         $bot = TelegramBot::where('public_key', $public_key)->first();
         if($bot == null) {
