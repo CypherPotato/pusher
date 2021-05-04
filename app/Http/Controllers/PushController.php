@@ -130,15 +130,16 @@ class PushController extends Controller
 
     public static function DeleteMessage(Request $request) {
         if($request->id == null) return back()->with("message", "Error: ID was not provided.");
-        if($request->hash == null) return back()->with("message", "Error: hash wasn't provided.");
+        if($request->public_key == null) return back()->with("message", "Error: public_key wasn't provided.");
+        if($request->private_key == null) return back()->with("message", "Error: private_key wasn't provided.");
 
         $msg = PushMessage::where('id', $request->id)->first();
 
-        if($msg == null) return back()->with("message", "Error: message not found.");
-        if($msg->public_key != $request->hash) return back()->with("message", "Error: message private key doens't match with provided key.");
+        if($msg == null) return redirect(route('ViewMessages', ["hash" => $request->private_key]))->with("message", "Error: message not found.");
+        if($msg->public_key != $request->public_key) return back()->with("message", "Error: message private key doens't match with provided key.");
 
         $msg->delete();
-        return back();
+        return redirect(route('ViewMessages', ["hash" => $request->private_key]));
     }
 
     public static function DeleteKeyPair(Request $request) {
@@ -170,6 +171,12 @@ class PushController extends Controller
         }
     }
 
+    public static function MessagesComponent(Request $request) {
+        $messages = PushMessage::where('public_key', $request->public_key)->orderBy("created_at", "DESC")->get();
+
+        return view('messagesComponent', ["messages" => $messages, "public_key" => $request->public_key, "private_key" => $request->private_key]);
+    }
+
     public static function ViewMessages(Request $request) {
         if($request->has("hash")) {
             $hash = $request->hash;
@@ -182,13 +189,81 @@ class PushController extends Controller
         $salt = hash('md5', $hash);
         $public_key = hash('sha256', $hash);
 
-        $messages = PushMessage::where('public_key', $public_key)->orderBy("created_at", "DESC")->get();
         $token = TelegramBot::where('public_key', $public_key)->first();
 
         $keys = KeyPair::where('private_key', $hash)->orderBy("created_at", "DESC")->paginate(20, ['*'], 'keys');
         $keys->setPath($request->fullUrl());
 
-        return view('viewMessages', ["messages" => $messages, 'public_key' => $public_key, 'telegramBot' => $token, 'salt' => $salt, 'public_keys' => $keys, "hash" => $hash, "hostname" => $_SERVER['SERVER_NAME']]);
+        return view('viewMessages', ['public_key' => $public_key, 'telegramBot' => $token, 'salt' => $salt, 'public_keys' => $keys, "hash" => $hash, "hostname" => $_SERVER['SERVER_NAME']]);
+    }
+
+    public static function MessageEditor(Request $request) {
+        if($request->id == null) return back()->with("message", "Error: no ID was provided.");
+        if($request->public_key == null) return back()->with("message", "Error: no public_key was provided.");
+        if($request->private_key == null) return back()->with("message", "Error: no private_key was provided.");
+        
+        $msg = PushMessage::where('id', $request->id)->first();
+        if($msg == null) {
+            return back()->with("message", "Error: message not found.");
+        } else {
+            if($msg->public_key != $request->public_key) {
+                return back()->with("message", "Error: invalid public_key.");
+            }
+        }
+
+        return view('messageEditor', ["id" => $request->id, "public_key" => $request->public_key, "hash" => $request->private_key, "subject" => $msg->subject, "message" => $msg->message, "hostname" => $_SERVER['SERVER_NAME']]);
+    }
+
+    public static function GetMessage(Request $request) {
+        if($request->public_key == null) return response()->json(["success" => false, "message" => "Public key not provided."], 400);
+        if($request->id == null) return response()->json(["success" => false, "message" => "ID not provided."], 400);
+        
+        $msg = PushMessage::where('id', $request->id)->first();
+        if($msg == null) {
+            return response()->json(["success" => false, "message" => "Message not found."], 400);
+        } else {
+            if($msg->public_key != $request->public_key) {
+                return response()->json(["success" => false, "message" => "Invalid public_key."], 400);
+            }
+        }
+
+        return response()->json(["success" => true, "data" => $msg->toArray()]);
+    }
+
+    public static function EditMessage(Request $request) {
+        if($request->public_key == null) return response()->json(["success" => false, "message" => "Public key not provided."], 400);
+        if($request->id == null) return response()->json(["success" => false, "message" => "ID not provided."], 400);
+        if($request->message == null) return response()->json(["success" => false, "message" => "Text not provided."], 400);
+        if($request->subject == null) return response()->json(["success" => false, "message" => "Subject not provided."], 400);
+
+        $pmsg = PushMessage::where('id', $request->id)->first();
+        if($pmsg == null) {
+            return response()->json(["success" => false, "message" => "Message not found."], 400);
+        } else {
+            if($pmsg->public_key != $request->public_key) {
+                return response()->json(["success" => false, "message" => "Invalid public_key."], 400);
+            }
+        }
+
+        $pmsg->subject = $request->subject;
+        $pmsg->message = $request->message;
+
+        $data = $request->toArray();
+        // send telegramMessage
+        if(!isset($request->cancelTelegramMessage) && $request->cancelTelegramMessage != true) {
+            $message = "Pusher message edited\n[Subject]\n$request->subject\n\n[Text]\n$request->message";
+            self::SendTelegramMessage($request->public_key, $message);
+        }
+
+        $pmsg->save();
+
+        $data["id"] = $pmsg->id;
+
+        if($request->method() == "POST") {
+            return redirect(route('ViewMessages', ["hash" => $request->hash]));
+        } else {
+            return response()->json(["success" => true, "message" => "Message edited", "data" => $data], 200);
+        }
     }
 
     public static function Push(Request $request) {
@@ -204,24 +279,36 @@ class PushController extends Controller
         $pmsg->subject = $request->subject;
         $pmsg->message = $request->message;
 
+        $data = $request->toArray();
         // send telegramMessage
         if(!isset($request->cancelTelegramMessage) && $request->cancelTelegramMessage != true) {
-            $bot = TelegramBot::where('public_key', $request->public_key)->first();
-            $token = $bot->token;
-            if($bot != null) {
-                $update = Http::get("https://api.telegram.org/bot$token/getUpdates");
-                foreach(json_decode($update)->result as $result) {
-                    $chatId = $result->message->chat->id;
-
-                    $response = Http::get("https://api.telegram.org/bot$token/sendMessage", [
-                        "chat_id" => $chatId,
-                        "text" => "Pusher message\n[Subject]\n$request->subject\n\n[Text]\n$request->message"
-                    ]);
-                }
-            }
+            $message = "Pusher message\n[Subject]\n$request->subject\n\n[Text]\n$request->message";
+            self::SendTelegramMessage($request->public_key, $message);
         }
 
         $pmsg->save();
-        return response()->json(["success" => true, "message" => "Message inserted.", "data" => $request->toArray()], 200);
+
+        $data["id"] = $pmsg->id;
+
+        return response()->json(["success" => true, "message" => "Message inserted", "data" => $data], 200);
+    }
+
+    public static function SendTelegramMessage($public_key, $message) {
+        $bot = TelegramBot::where('public_key', $public_key)->first();
+        if($bot == null) {
+            return;  // no telegram message is set to this public key
+        }
+        $token = $bot->token;
+        if($bot != null) {
+            $update = Http::get("https://api.telegram.org/bot$token/getUpdates");
+            foreach(json_decode($update)->result as $result) {
+                $chatId = $result->message->chat->id;
+
+                $response = Http::get("https://api.telegram.org/bot$token/sendMessage", [
+                    "chat_id" => $chatId,
+                    "text" => $message
+                ]);
+            }
+        }
     }
 }

@@ -59,34 +59,11 @@
                 <div class="card mb-2 shadow border-0">
                     <div class="card-header">
                         <button class="btn btn-link pusher-color" data-toggle="collapse" data-target="#block2" aria-expanded="true" aria-controls="block">
-                            Últimas mensagens recebidas no canal
+                            Dynamic messages
                         </button>
                     </div>
                     <div class="card-body collapse show" id="block2">
-                        <table id="messagesTable" class="table table-sm">
-                            <thead>
-                            <tr>
-                                <th scope="col" width="20%"><small><b>Date and time</b></small></th>
-                                <th scope="col" width="30%"><small><b>Subject</b></small></th>
-                                <th scope="col" width="50%"><small><b>Message</b></small></th>
-                                <th scope="col" width="5%"><small></small></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @forelse($messages as $message)
-                                <tr>
-                                    <td scope="col" width="20%"><small>{{$message->created_at->toString()}}<small></td>
-                                    <td scope="col" width="25%" style="word-wrap: break-word;"><small>{{$message->subject}}<small></td>
-                                    <td scope="col" width="50%" style="word-wrap: break-word;"><small>{!! $message->message !!}<small></td>
-                                        <th scope="col" width="5%"><a class="btn btn-sm btn-link" href="{{route('DeleteMessage', ['hash' => $public_key, 'id' => $message->id])}}">Delete</a></th>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan=4 class="text-center pt-3">There's no messages received on this channel.</td>
-                                </tr>
-                            @endforelse
-                            </tbody>
-                        </table>
+                        Reading messages from server...
                     </div>
                 </div>
                 <div class="card mb-2 shadow border-0">
@@ -163,6 +140,19 @@ $(document).ready(function() {
     $("#messagesTable").dataTable({
         "order": []
     });
+    setInterval(function() {
+        $.ajax({
+            url: "{{ route('MessagesComponentCallback') }}",
+            data: {
+                public_key: '{{ $public_key }}',
+                private_key: '{{ $hash }}'
+            },
+            success: function(response) {
+                console.log(response);
+                $('#block2').html(response);
+            }
+        })
+    }, 3000);
 });
 </script>
 @endsection
