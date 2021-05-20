@@ -215,8 +215,8 @@ class PushController extends Controller
     }
 
     public static function GetMessage(Request $request) {
-        if($request->public_key == null) return response()->json(["success" => false, "message" => "Public key not provided."], 400);
-        if($request->id == null) return response()->json(["success" => false, "message" => "ID not provided."], 400);
+        if($request->public_key == null) return response()->json(["success" => false, "message" => "GetMessage: Public key not provided."], 400);
+        if($request->id == null) return response()->json(["success" => false, "message" => "GetMessage: ID not provided."], 400);
         
         $msg = PushMessage::where('id', $request->id)->first();
         if($msg == null) {
