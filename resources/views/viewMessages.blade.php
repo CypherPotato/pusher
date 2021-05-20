@@ -31,7 +31,7 @@
                             </div>
                             <div class="form-group col-sm-12 col-md-3">
                                 <label for="endpoint">Endpoint</label>
-                                <input class="form-control bg-white" id="endpoint" type="text" readonly value="https://{{$hostname}}/push">
+                                <input class="form-control bg-white" id="endpoint" type="text" readonly value="https://{{$hostname}}/api/push">
                             </div>
                             <div class="form-group col-sm-12 col-md-2">
                                 <label for="endpoint">Method</label>
