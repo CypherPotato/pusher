@@ -232,7 +232,7 @@ class PushController extends Controller
 
     public static function EditMessage(Request $request) {
         if($request->public_key == null) return response()->json(["success" => false, "message" => "Public key not provided."], 400);
-        if($request->id == null) return response()->json(["success" => false, "message" => "ID not provided."], 400);
+        if($request->id == null) return response()->json(["success" => false, "message" => "ID not provided. [3]"], 400);
         if($request->message == null) return response()->json(["success" => false, "message" => "Text not provided."], 400);
         if($request->subject == null) return response()->json(["success" => false, "message" => "Subject not provided."], 400);
 
