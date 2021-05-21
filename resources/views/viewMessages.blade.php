@@ -137,9 +137,6 @@
 @section("scripts")
 <script>
 $(document).ready(function() {
-    $("#messagesTable").dataTable({
-        "order": []
-    });
     setInterval(function() {
         $.ajax({
             url: "{{ route('MessagesComponentCallback') }}",

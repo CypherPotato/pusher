@@ -22,3 +22,11 @@
     @endforelse
     </tbody>
 </table>
+
+<script>
+$(document).ready(function() {
+    $("#messagesTable").dataTable({
+        "order": []
+    });
+});
+</script>
