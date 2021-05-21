@@ -59,7 +59,7 @@
                 <div class="card mb-2 shadow border-0">
                     <div class="card-header">
                         <button class="btn btn-link pusher-color" data-toggle="collapse" data-target="#block2" aria-expanded="true" aria-controls="block">
-                            Dynamic messages
+                            Dynamic messages <button class="btn btn-primary" onclick="updateMessagesTable()">Update</button>
                         </button>
                     </div>
                     <div class="card-body collapse show" id="block2">
@@ -136,20 +136,23 @@
 
 @section("scripts")
 <script>
+function updateMessagesTable() {
+    $.ajax({
+        url: "{{ route('MessagesComponentCallback') }}",
+        data: {
+            public_key: '{{ $public_key }}',
+            private_key: '{{ $hash }}'
+        },
+        success: function(response) {
+            console.log(response);
+            $('#block2').html(response);
+        }
+    })
+}
+
 $(document).ready(function() {
-    setInterval(function() {
-        $.ajax({
-            url: "{{ route('MessagesComponentCallback') }}",
-            data: {
-                public_key: '{{ $public_key }}',
-                private_key: '{{ $hash }}'
-            },
-            success: function(response) {
-                console.log(response);
-                $('#block2').html(response);
-            }
-        })
-    }, 3000);
+    
+    updateMessagesTable();
 });
 </script>
 @endsection
