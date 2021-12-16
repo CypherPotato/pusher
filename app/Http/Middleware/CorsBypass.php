@@ -15,9 +15,8 @@ class CorsBypass
      */
     public function handle($request, Closure $next)
     {
-        $headers["Access-Control-Allow-Origin"] = "*";
-        $headers["Access-Control-Allow-Methods"] = "PUT, PATCH, POST, DELETE, GET, OPTIONS";
-        $headers["Access-Control-Allow-Headers"] = "Accept, Authorization, Content-Type";
-        return $next($request);
+        return $next($request)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');;
     }
 }
