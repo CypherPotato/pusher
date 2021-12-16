@@ -282,6 +282,7 @@ class PushController extends Controller
         $data = $request->toArray();
         // send telegramMessage
         if(!isset($request->cancelTelegramMessage) && $request->cancelTelegramMessage != true) {
+            dd($message);
             $message = "Pusher message\n[Subject]\n$request->subject\n\n[Text]\n$request->message";
             self::SendTelegramMessage($request->public_key, $message);
         }
