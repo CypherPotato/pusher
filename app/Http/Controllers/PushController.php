@@ -275,6 +275,9 @@ class PushController extends Controller
         if(strlen($request->public_key) != 64) return response()->json(["success" => false, "message" => "Public key is invalid."], 400);
         if(!ctype_xdigit($request->public_key)) return response()->json(["success" => false, "message" => "Public key is invalid."], 400);
 
+        if(is_array($request->message)) $request->message = json_encode($request->message);
+        if(is_array($request->subject)) $request->subject = json_encode($request->subject);
+
         $pmsg->public_key = $request->public_key;
         $pmsg->subject = $request->subject;
         $pmsg->message = $request->message;
@@ -282,7 +285,6 @@ class PushController extends Controller
         $data = $request->toArray();
         // send telegramMessage
         if(!isset($request->cancelTelegramMessage) && $request->cancelTelegramMessage != true) {
-            dd($request->message);
             $message = "Pusher message\n[Subject]\n$request->subject\n\n[Text]\n$request->message";
             self::SendTelegramMessage($request->public_key, $message);
         }
