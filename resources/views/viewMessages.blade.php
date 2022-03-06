@@ -85,9 +85,9 @@
                             <tbody>
                             @forelse($public_keys as $key)
                                 <tr>
-                                    <td scope="col" width="20%"><small>{{$key->created_at->toString()}}<small></td>
-                                    <td scope="col" width="50%"><code>{{$key->public_key}}<code></td>
-                                    <td scope="col" width="25%" style="word-wrap: break-word;"><small>{{substr($key->text, 0, 44)}}<small></td>
+                                    <td class="public-key-created-at" scope="col" width="20%"><small>{{$key->created_at->toString()}}<small></td>
+                                    <td class="public-key-public-key" scope="col" width="50%"><code>{{$key->public_key}}<code></td>
+                                    <td class="public-key-subject" scope="col" width="25%" style="word-wrap: break-word;"><small>{{substr($key->text, 0, 44)}}<small></td>
                                     <th scope="col" width="5%"><a class="btn btn-sm btn-link" href="{{route('EditPublicKeyView', ['public_key' => $key->public_key, 'hash' => $hash])}}">Edit</a></th>
                                 </tr>
                             @empty

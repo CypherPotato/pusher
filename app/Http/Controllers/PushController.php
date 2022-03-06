@@ -249,18 +249,12 @@ class PushController extends Controller
         $pmsg->message = $request->message;
 
         $data = $request->toArray();
-        // send telegramMessage
-        if(!isset($request->cancelTelegramMessage) && $request->cancelTelegramMessage != true) {
-            $message = "Pusher message edited\n[Subject]\n$request->subject\n\n[Text]\n$request->message";
-            //self::SendTelegramMessage($request->public_key, $message);
-        }
-
         $pmsg->save();
 
         $data["id"] = $pmsg->id;
 
         if($request->method() == "POST") {
-            return redirect(route('ViewMessages', ["hash" => $request->hash]));
+            return redirect()->back();
         } else {
             return response()->json(["success" => true, "message" => "Message edited", "data" => $data], 200);
         }
